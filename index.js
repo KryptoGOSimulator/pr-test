@@ -13,10 +13,18 @@ const users = [];
 // Create a new user
 router.post('/users', (ctx) => {
   const newUser = ctx.request.body;
-  // insert new user
-  newUser.id = users.length + 1;
-  users.push(newUser);
-  ctx.body = { message: 'User created', user: newUser };
+  // don't allow duplicate user [name, email]
+  const duplicateUser = users.find((user) => user.email === newUser.email);
+  if (duplicateUser) {
+    // duplicate user
+    ctx.status = 409;
+    ctx.body = { message: 'This user already exists' };
+  } else {
+    // insert new user
+    newUser.id = users.length + 1;
+    users.push(newUser);
+    ctx.body = { message: 'User created', user: newUser };
+  }
 });
 
 // Get all users
